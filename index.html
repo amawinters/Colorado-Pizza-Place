@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorado Pizza Place</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="brand">🍕 Colorado Pizza Place</div>
+    <button class="cart-button" onclick="openCart()">Cart (<span id="cartCount">0</span>)</button>
+</header>
+
+<main>
+    <section class="hero">
+        <h1>Fresh Pizza. Your Way.</h1>
+        <p>Build your perfect pizza and choose pickup or delivery.</p>
+    </section>
+
+    <section>
+        <h2>Our Menu</h2>
+        <div id="menu" class="menu-grid"></div>
+    </section>
+</main>
+<!--Customize Pizza Modal-->
+<div id="customizeModal" class="modal hidden">
+    <div class="modal-content">
+        <button class="close" onclick="closeCustomize()">&times;</button>
+        <h2 id="customPizzaName"></h2>
+        <p id="customPizzaDescription"></p>
+        <!--Pizza Size-->
+        <label>Size</label>
+        <select id="size" onchange="updatePrice()">
+            <option value="Small">Small (+$0.00)</option>
+            <option value="Medium" selected>Medium (+$2.00)</option>
+            <option value="Large">Large (+$4.00)</option>
+        </select>
+        <!--Crust Options-->
+        <label>Crust</label>
+        <select id="crust" onchange="updatePrice()">
+            <option>Original</option>
+            <option>Thin N Crispy</option>
+            <option>Stuff Crust</option>
+        </select>
+        <!--Toppings Options-->
+        <h3>Choose Your Toppings</h3>
+        <!--Meat Toppings-->
+        <div class="topping-section">
+            <h4>🥩Meat Toppings</h4>
+            <div id="meatToppings" class="toppings-list">
+            </div>
+        </div>
+        <!--Veggie Toppings-->
+        <div class="topping-section">
+            <h4>🥬Veggie Toppings</h4>
+            <div id="veggieToppings" class="toppings-list">
+            </div>
+        </div>
+        <!--Cheese Toppings-->
+        <div class="topping-section">
+            <h4>🧀Cheese Toppings</h4>
+            <div id="cheeseToppings" class="toppings-list">
+            </div>
+        </div>
+        <div class="price">
+            Price: $<span id="customPrice">0.00</span>
+        </div>
+        <button class="primary" onclick="addToCart()">Add to Cart</button>
+    </div>
+</div>
+
+<div id="cartModal" class="modal hidden">
+    <div class="modal-content">
+        <button class="close" onclick="closeCart()">&times</button>
+        <h2>Your Cart</h2>
+        <div id="cartItems"></div>
+        <!--Subtotal-->
+        <div class="summary">
+            <p>Subtotal: $<span id="subtotal">0.00</span></p>
+        </div>
+        <!--Pickup or Delivery-->
+        <h3>Order Type</h3>
+        <label><input type="radio" name="orderType" value="pickup" checked onchange="updateSummary()"> Pickup</label>
+        <label><input type="radio" name="orderType" value="delivery" onchange="updateSummary()"> Delivery Fee(+$3.99)</label>
+        <!--Delivery Information-->
+        <div id="deliveryFields" class="hidden">
+            <input id="address" placeholder="Delivery address">
+            <input id="city" placeholder="City">
+            <input id="zip" placeholder="ZIP code">
+        </div>
+        <!--Order Summary-->
+        <div class="summary">
+            <p>Tax: $<span id="tax">0.00</span></p>
+            <p>Delivery Fee: $<span id="deliveryFee">0.00</span></p>
+            <h3>Total: $<span id="total">0.00</span></h3>
+        </div>
+        <button class="primary" onclick="placeOrder()">Place Order</button>
+        <p id="orderMessage" class="message"></p>
+    </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
