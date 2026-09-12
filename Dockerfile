@@ -1,13 +1,13 @@
-# Use official Java runtime
-FROM openjdk:17-jdk-slim
+# Use a Render-compatible Java image
+FROM eclipse-temurin:17-jdk
 
 # Set working directory
 WORKDIR /app
 
-# Copy everything
+# Copy everything into the container
 COPY . .
 
-# Compile Java source files
+# Compile all Java files
 RUN javac $(find . -name "*.java")
 
 # Expose Render's port
