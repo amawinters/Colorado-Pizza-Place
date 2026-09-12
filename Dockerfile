@@ -1,18 +1,17 @@
-# Use a Render-compatible Java image
 FROM eclipse-temurin:17-jdk
 
-# Set working directory
 WORKDIR /app
 
-# Copy everything into the container
+# Copy everything
 COPY . .
 
-# Compile all Java files
-RUN javac $(find . -name "*.java")
+# Compile Java files into /app (root), preserving package structure
+RUN mkdir -p /app/classes \
+    && javac -d /app/classes $(find src -name "*.java")
 
 # Expose Render's port
 ENV PORT=8080
 EXPOSE 8080
 
-# Start your server
-CMD ["java", "com.coloradopizza.PizzaServer"]
+# Run the server using the compiled classes
+CMD ["java", "-cp", "/app/classes", "com.coloradopizza.PizzaServer"]
