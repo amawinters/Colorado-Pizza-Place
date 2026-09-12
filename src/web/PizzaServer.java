@@ -29,6 +29,31 @@ public class PizzaServer {
         //static files
         server.createContext("/style.css", exchange -> staticFile(exchange, "style.css", "text/css"));
         server.createContext("/app.js", exchange -> staticFile(exchange, "app.js", "application/javascript"));
+        server.createContext("/images", exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                send(exchange, 405, "Method Not Allowed", "text/plain");
+                return;
+            }
+
+            // Remove leading slash and build path inside src/web/images
+            String filePath = exchange.getRequestURI().getPath().replaceFirst("/", "");
+            Path file = Path.of("src", "web", filePath);
+
+            if (!Files.exists(file)) {
+                send(exchange, 404, "Not Found", "text/plain");
+                return;
+            }
+
+            String contentType = Files.probeContentType(file);
+            byte[] bytes = Files.readAllBytes(file);
+
+            exchange.getResponseHeaders().set("Content-Type", contentType);
+            exchange.sendResponseHeaders(200, bytes.length);
+
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(bytes);
+            }
+        });
         server.setExecutor(null);
         server.start();
 
