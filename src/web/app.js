@@ -208,7 +208,16 @@ function updateSummary() {
 }
 // Place the order
 function placeOrder() {
-    if (!cart.length) return showMessage('Add a pizza to the cart before placing an order.');
+      if (!cart.length) return showMessage('Add a pizza to the cart before placing an order.');
+
+    const captchaResponse =
+        document.querySelector('[name="cf-turnstile-response"]')?.value;
+
+    if (!captchaResponse) {
+        showMessage('Please complete the I am not a robot verification.');
+        return;
+    }
+
     const selectedOrderType =
         document.querySelector(
             'input[name="orderType"]:checked');
