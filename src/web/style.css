@@ -13,7 +13,7 @@ body {
     color: #222; 
 }
 
-/* HERO SECTION WITH ALL UPGRADES */
+/* HERO SECTION */
 .hero {
     position: relative;
     width: 100%;
@@ -21,14 +21,11 @@ body {
     overflow: hidden;
 }
 
-/* HERO IMAGE */
 .hero img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-
-    /* Parallax effect */
     transform: translateZ(0);
     will-change: transform;
 }
@@ -72,19 +69,18 @@ body {
     animation: fadeInHero 1.4s ease forwards;
 }
 
-/* FADE-IN ANIMATION */
 @keyframes fadeInHero {
     from { opacity: 0; transform: translateX(-50%) translateY(20px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* FOREST GREEN HEADER */
+/* HEADER */
 header { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     padding: 16px 6%; 
-    background: #0b3d2e;   /* ✔ FOREST GREEN */
+    background: #0b3d2e; /* Forest green */
     color: white; 
     position: sticky; 
     top: 0; 
@@ -105,12 +101,12 @@ header {
     font-family: 'Cinzel', serif;
 }
 
-.cart-button { background: white; color: #0b3d2e; } /* updated to match header */
-
+.cart-button { background: white; color: #0b3d2e; }
 .primary { background: #0b3d2e; color: white; width: 100%; margin-top: 15px; }
 
 main { max-width: 1100px; margin: auto; padding: 25px; }
 
+/* MENU GRID */
 .menu-grid { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
@@ -137,6 +133,7 @@ main { max-width: 1100px; margin: auto; padding: 25px; }
     margin-top: 15px; 
 }
 
+/* MODALS */
 .modal { 
     position: fixed; 
     inset: 0; 
@@ -190,6 +187,7 @@ select, input[type=text], #deliveryFields input {
 
 .hidden { display: none; }
 
+/* CART SUMMARY */
 .summary { 
     border-top: 1px solid #ddd; 
     margin-top: 18px; 
@@ -211,6 +209,86 @@ select, input[type=text], #deliveryFields input {
     text-align: center; 
 }
 
+/* ---------------- PAYMENT SECTION ---------------- */
+.payment-section {
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.payment-section label {
+    display: block;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.payment-section input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 4px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* ---------------- LOADING SPINNER ---------------- */
+.spinner {
+    border: 6px solid #ddd;
+    border-top: 6px solid #0b3d2e; /* Forest green */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 0.8s linear infinite;
+    margin: 15px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ---------------- RECEIPT PAGE ---------------- */
+.receipt {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 350px;
+    margin: 30px auto;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(0,0,0,0.25);
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+}
+
+.receipt h2 {
+    margin-bottom: 15px;
+    color: #0b3d2e;
+}
+
+.receipt p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.receipt button {
+    margin-top: 15px;
+    padding: 10px 18px;
+    background: #0b3d2e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.receipt button:hover {
+    background: #09402a;
+}
+
+/* RESPONSIVE */
 @media (max-width: 700px) { 
     .menu-grid { grid-template-columns: 1fr; } 
     header { padding: 14px 4%; } 
