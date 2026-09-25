@@ -143,6 +143,14 @@ function addToCart() {
     };
 
     cart.push(item);
+
+    /* ⭐ PIZZA ICON WIGGLE ANIMATION */
+    const icon = document.querySelector('.pizza-icon');
+    if (icon) {
+        icon.classList.add('wiggle');
+        setTimeout(() => icon.classList.remove('wiggle'), 400);
+    }
+
     closeCustomize();
     updateCartCount();
     openCart();
@@ -222,6 +230,11 @@ function updateSummary() {
 
     const total = sub + tax + (delivery ? DELIVERY_FEE : 0);
     document.getElementById('total').textContent = total.toFixed(2);
+
+    /* ⭐ TOTAL PRICE GLOW ANIMATION */
+    const totalEl = document.getElementById('total');
+    totalEl.classList.add('total-glow');
+    setTimeout(() => totalEl.classList.remove('total-glow'), 600);
 }
 
 /* ---------------- RECEIPT PAGE ---------------- */
@@ -296,6 +309,13 @@ function placeOrder() {
 
         const orderNumber = Math.floor(10000 + Math.random() * 90000);
         const total = document.getElementById('total').textContent;
+
+        /* ⭐ CONFETTI CELEBRATION */
+        confetti({
+            particleCount: 120,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
 
         showReceipt(orderNumber, total);
 

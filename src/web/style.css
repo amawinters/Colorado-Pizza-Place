@@ -145,6 +145,7 @@ main { max-width: 1100px; margin: auto; padding: 25px; }
     z-index: 10; 
 }
 
+/* ---------------- MODAL SLIDE-IN ANIMATION ---------------- */
 .modal-content { 
     background: white; 
     border-radius: 12px; 
@@ -153,6 +154,12 @@ main { max-width: 1100px; margin: auto; padding: 25px; }
     max-height: 90vh; 
     overflow-y: auto; 
     position: relative; 
+    animation: modalSlide 0.35s ease-out;
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .close { 
@@ -204,9 +211,16 @@ select, input[type=text], #deliveryFields input {
 
 .qty button { margin-left: 4px; }
 
+/* ---------------- ERROR MESSAGE FADE ---------------- */
 .message { 
     font-weight: bold; 
     text-align: center; 
+    animation: fadeMessage 0.4s ease;
+}
+
+@keyframes fadeMessage {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* ---------------- PAYMENT SECTION ---------------- */
@@ -234,17 +248,21 @@ select, input[type=text], #deliveryFields input {
 /* ---------------- LOADING SPINNER ---------------- */
 .spinner {
     border: 6px solid #ddd;
-    border-top: 6px solid #0b3d2e; /* Forest green */
+    border-top: 6px solid #0b3d2e;
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.8s linear infinite, spinnerFade 0.3s forwards;
     margin: 15px auto;
 }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes spinnerFade {
+    to { opacity: 1; }
 }
 
 /* ---------------- RECEIPT PAGE ---------------- */
@@ -261,6 +279,12 @@ select, input[type=text], #deliveryFields input {
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
+    animation: receiptFade 0.5s ease-out;
+}
+
+@keyframes receiptFade {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 .receipt h2 {
@@ -286,6 +310,34 @@ select, input[type=text], #deliveryFields input {
 
 .receipt button:hover {
     background: #09402a;
+}
+
+/* ---------------- BUTTON PRESS ---------------- */
+.primary:active {
+    transform: scale(0.96);
+}
+
+/* ---------------- TOTAL PRICE GLOW ---------------- */
+.total-glow {
+    animation: glow 0.6s ease-out;
+}
+
+@keyframes glow {
+    from { background-color: #dfffd8; }
+    to { background-color: transparent; }
+}
+
+/* ---------------- PIZZA ICON WIGGLE ---------------- */
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.pizza-icon.wiggle {
+    animation: wiggle 0.4s ease;
 }
 
 /* RESPONSIVE */
