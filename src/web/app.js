@@ -4,6 +4,7 @@ let selectedPizza = null;
 let foodItems = [];
 let selectedWing = null;
 let selectedWingSauce = null;
+
 let toppingsData = {
     meat: [],
     veggie: [],
@@ -133,61 +134,44 @@ function updatePrice() {
 async function loadFoodItems() {
     try {
         const response = await fetch('/api/food-items');
-        if (!response.ok) {
-            throw new Error("Unable to load additonal food items");
-    }
-    foodItems = await response.json();
-    const foodContainer = document.getElementById('foodItems');
-    foodContainer.innerHTML = foodItems.map(item => {
-            let button;
-            if (item.name == "Wings") {
-                button = `
-                    <button
-                        class="primary"
-                        onclick="openWingsCustomization(${item.id})">
-                        Customize Wings
-                    </button>
-                `;
-            }else{
-                button = `
-                    <button
-                        class="primary"
-                        onclick="addFoodItemToCart(${item.id})">
-                        Add to Cart
-                    </button>
-                `;
+        if (!response.ok) throw new Error("Unable to load additional food items");
+
+        foodItems = await response.json();
+
+        const foodContainer = document.getElementById('foodItems');
+        foodContainer.innerHTML = foodItems.map(item => {
+            const button = item.name === "Wings"
+                ? `<button class="primary" onclick="openWingCustomization(${item.id})">Customize Wings</button>`
+                : `<button class="primary" onclick="addFoodItemToCart(${item.id})">Add to Cart</button>`;
+
             return `
                 <article class="card">
                     <div class="pizza-icon">🍽️</div>
                     <h3>${item.name}</h3>
                     <p>${item.description}</p>
-                    <p>
-                        <strong>$${item.price.toFixed(2)}</strong>
-                    </p>
+                    <p><strong>$${item.price.toFixed(2)}</strong></p>
                     ${button}
                 </article>
             `;
-            }
         }).join('');
     } catch (error) {
         console.error(error);
-        document.getElementById('foodItems').innerHTML = 
-            '<p>Unable to load additional food items.</p/>';
+        document.getElementById('foodItems').innerHTML =
+            '<p>Unable to load additional food items.</p>';
     }
 }
 
-/* ---------------- WING FUNCTIONS ---------------- */
+/* ---------------- WING FUNCTIONS (FULLY FIXED) ---------------- */
 async function openWingCustomization(id) {
-    selectedWing = foodItems.find(item => item.id ==== id);
-    if(!selectedWing) {
-        return;
-    }
+    selectedWing = foodItems.find(item => item.id === id);
+    if (!selectedWing) return;
+
     try {
         const response = await fetch('/api/wing-sauces');
-        if(!response.ok) {
-            throw new Error("Unable to load wing sauces");
-        }
-        const sauces - await response.json();
+        if (!response.ok) throw new Error("Unable to load wing sauces");
+
+        const sauces = await response.json();
+
         const sauceContainer = document.getElementById('wingSauces');
         sauceContainer.innerHTML = sauces.map((sauce, index) => `
             <label class="topping-option">
@@ -196,32 +180,36 @@ async function openWingCustomization(id) {
                     name="wingSauce"
                     value="${sauce}"
                     ${index === 0 ? 'checked' : ''}
-                    onchange="selectedWingSauce(this.value)">
+                    onchange="selectWingSauce(this.value)">
                 ${sauce}
             </label>
         `).join('');
+
         selectedWingSauce = sauces[0];
-        document.getElementById('wingPrice').textContent = 
-            selectedWing.price.toFixed(2);
-        document.getELementById('wingModal').classList.remove('hidden');
+        document.getElementById('wingPrice').textContent = selectedWing.price.toFixed(2);
+        document.getElementById('wingModal').classList.remove('hidden');
+
     } catch (error) {
         console.error(error);
         alert("Unable to load wing sauces.");
     }
 }
+
 function selectWingSauce(sauce) {
-    selectWingSauce = sauce;
+    selectedWingSauce = sauce;
 }
+
 function closeWingModal() {
     document.getElementById('wingModal').classList.add('hidden');
 }
+
 function addWingsToCart() {
-    if (!selectedWing) {
+    if (!selectedWing) return;
+    if (!selectedWingSauce) {
+        showMessage("Please select a sauce for your wings.");
         return;
     }
-    if(!selectedWingSauce) {
-        showMessage("Please select a sauce for your wings.");
-    }
+
     const item = {
         pizzaName: selectedWing.name,
         size: "N/A",
@@ -230,11 +218,13 @@ function addWingsToCart() {
         unitPrice: selectedWing.price,
         quantity: 1
     };
+
     cart.push(item);
-    closedWingModal();
+    closeWingModal();
     updateCartCount();
     openCart();
 }
+
 /* ---------------- CART FUNCTIONS ---------------- */
 function addToCart() {
     if (!selectedPizza) return;
@@ -253,7 +243,6 @@ function addToCart() {
 
     cart.push(item);
 
-    /* ⭐ PIZZA ICON WIGGLE ANIMATION */
     const icon = document.querySelector('.pizza-icon');
     if (icon) {
         icon.classList.add('wiggle');
@@ -267,9 +256,8 @@ function addToCart() {
 
 function addFoodItemToCart(id) {
     const item = foodItems.find(food => food.id === id);
-    if(!item) {
-        return;
-    }
+    if (!item) return;
+
     const cartItem = {
         pizzaName: item.name,
         size: 'N/A',
@@ -278,6 +266,7 @@ function addFoodItemToCart(id) {
         unitPrice: item.price,
         quantity: 1
     };
+
     cart.push(cartItem);
     updateCartCount();
     openCart();
@@ -358,7 +347,6 @@ function updateSummary() {
     const total = sub + tax + (delivery ? DELIVERY_FEE : 0);
     document.getElementById('total').textContent = total.toFixed(2);
 
-    /* ⭐ TOTAL PRICE GLOW ANIMATION */
     const totalEl = document.getElementById('total');
     totalEl.classList.add('total-glow');
     setTimeout(() => totalEl.classList.remove('total-glow'), 600);
@@ -383,7 +371,7 @@ function closeReceipt() {
     document.getElementById('receiptPage').classList.add('hidden');
 }
 
-/* ---------------- PLACE ORDER (UPDATED) ---------------- */
+/* ---------------- PLACE ORDER ---------------- */
 function placeOrder() {
     const orderMessage = document.getElementById("orderMessage");
     const spinner = document.getElementById("loadingSpinner");
@@ -437,7 +425,6 @@ function placeOrder() {
         const orderNumber = Math.floor(10000 + Math.random() * 90000);
         const total = document.getElementById('total').textContent;
 
-        /* ⭐ CONFETTI CELEBRATION */
         confetti({
             particleCount: 120,
             spread: 70,
