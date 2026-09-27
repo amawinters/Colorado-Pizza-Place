@@ -26,6 +26,7 @@ public class PizzaServer {
         server.createContext("/api/menu", this::menu);
         server.createContext("/api/toppings", this::toppings);
         server.createContext("/api/food-items", this::foodItems);
+        server.createContext("/api/wing-sauces", this::wingSauces);
         server.createContext("/health", this::health);
         //static files
         server.createContext("/style.css", exchange -> staticFile(exchange, "style.css", "text/css"));
@@ -156,9 +157,10 @@ public class PizzaServer {
     private void foodItems(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
             send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
         }
         StringBuilder json = new StringBuilder("[");
-        List<FoodItem> items = menuService.getFoodItems();
+        List<FoodItem> items = MenuService.getFoodItems();
 
         for (int i = 0; i < items.size(); i++) {
             FoodItem item = items.get(i);
@@ -179,6 +181,26 @@ public class PizzaServer {
                 .append(item.price())
 
                 .append("}");
+        }
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    private void wingSauces(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
+        }
+        StringBuilder json = new StringBuilder("[");
+        List<string> sauces = MenuService.getWingSauces();
+
+        for (int i = 0; i < sauces.size(); i++) {
+            if (i > 0) {
+                json.append(",");
+            }
+            json.append("\"")
+                .append(escape(sauces.get(i)))
+                .append("\"");
         }
         json.append("]");
         send(exchange, 200, json.toString(), "application/json");
