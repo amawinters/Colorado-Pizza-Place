@@ -25,6 +25,7 @@ public class PizzaServer {
         server.createContext("/", this::home);
         server.createContext("/api/menu", this::menu);
         server.createContext("/api/toppings", this::toppings);
+        server.createContext("/api/food-items", this::foodItems);
         server.createContext("/health", this::health);
         //static files
         server.createContext("/style.css", exchange -> staticFile(exchange, "style.css", "text/css"));
@@ -149,6 +150,37 @@ public class PizzaServer {
         json.append("]");
         json.append("}");
 
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    private void foodItems(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+        }
+        StringBuilder json = new StringBuilder("[");
+        List<FoodItem> items = menuService.getFoodItems();
+
+        for (int i = 0; i < items.size(); i++) {
+            FoodItem item = items.get(i);
+            if (i > 0) {
+                json.append(",");
+            }
+            json.append("{")
+                .append("\"id\":")
+                .append(item.id())
+
+                .append(",\"name\":\"")
+                .append(escape(item.name()))
+
+                .append("\",\"description\":\"")
+                .append(escape(item.description()))
+
+                .append("\",\"price\":")
+                .append(item.price())
+
+                .append("}");
+        }
+        json.append("]");
         send(exchange, 200, json.toString(), "application/json");
     }
 
