@@ -15,6 +15,10 @@ public class MenuService {
     private static final List<String> CHEESE_TOPPINGS = List.of(
             "Extra Cheese","Three Cheese Blend","Parmesan Cheese"
     );
+    
+    public static final List<String> WING_SAUCES = List.of(
+        "Buffalo","BBQ","Garlic Parmesan","Honey Chipotle","Unsauced"
+    );
 
     public static List<String> getMeatToppings() {
         return MEAT_TOPPINGS;
@@ -26,6 +30,10 @@ public class MenuService {
 
     public static List<String> getCheeseToppings() {
         return CHEESE_TOPPINGS;
+    }
+
+    public static List<String> getWingSauces() {
+        return WING_SAUCES;
     }
 
     private final List<Pizza> pizzas = List.of(
@@ -49,6 +57,7 @@ public class MenuService {
             9.99
         )
     );
+
     
     public List<Pizza> getPizzas() {
 
