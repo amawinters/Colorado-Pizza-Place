@@ -24,6 +24,10 @@
         <h2>Our Menu</h2>
         <div id="menu" class="menu-grid"></div>
     </section>
+    <section>
+        <h2>🍽️Other Food Items</h2>
+        <div id="foodItems" class="menu-grid"></div>
+    </section>
 </main>
 
 <!-- CUSTOMIZE PIZZA MODAL -->
@@ -69,6 +73,33 @@
         </div>
 
         <button class="primary" onclick="addToCart()">Add to Cart</button>
+    </div>
+</div>
+
+<!-- WING CUSTOMIZATION MODAL -->
+<div id="wingModal" class="modal hidden">
+    <div class="modal-content">
+        <button class="close" onclick="closeWingModal()">
+            ×
+        </button>
+        <h2>Customize Your Wings</h2>
+        <p>
+            Choose a sauce for your wings.
+        </p>
+        <div class="sauce-section">
+            <h3>🍗Wing Sauce</h3>
+            <div id="wingSauces"></div>
+        </div>
+        <p>
+            <strong>
+                Price: $<span id="wingPrice">9.99</span>
+            </strong>
+        </p>
+        <button
+            class="primary"
+            onclick="addWingsToCart()">
+            Add Wings to Cart
+        </button>
     </div>
 </div>
 

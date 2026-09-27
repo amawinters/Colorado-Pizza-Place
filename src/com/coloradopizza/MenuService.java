@@ -15,6 +15,10 @@ public class MenuService {
     private static final List<String> CHEESE_TOPPINGS = List.of(
             "Extra Cheese","Three Cheese Blend","Parmesan Cheese"
     );
+    
+    public static final List<String> WING_SAUCES = List.of(
+        "Buffalo","BBQ","Garlic Parmesan","Honey Chipotle"
+    );
 
     public static List<String> getMeatToppings() {
         return MEAT_TOPPINGS;
@@ -28,6 +32,10 @@ public class MenuService {
         return CHEESE_TOPPINGS;
     }
 
+    public static List<String> getWingSauces() {
+        return WING_SAUCES;
+    }
+
     private final List<Pizza> pizzas = List.of(
         new Pizza(1, "Cheese Pizza", "Cheese and pizza sauce on your choice of crust.", 10.99, List.of()),
         new Pizza(2, "Pepperoni Pizza", "Pepperoni, cheese, and pizza sauce on your choice of crust.", 12.99, List.of()),
@@ -35,16 +43,44 @@ public class MenuService {
         new Pizza(4, "Veggie Supreme", "Green peppers, onions, mushrooms, black olives, and tomatoes. This includes pizza sauce and cheese on your choice of crust.", 13.49, List.of())
     );
 
+    private final List<FoodItem> foodItems = List.of(
+        new FoodItem(
+            101,
+            "Garlic Bread",
+            "Warm garlic bread served with pizza sauce.",
+            5.99
+        ),
+        new FoodItem(
+            102,
+            "Wings",
+            "Juicy bone-in, chicken wings with your choice of sauce.",
+            9.99
+        )
+    );
+
+    
     public List<Pizza> getPizzas() {
 
         return pizzas;
     }
 
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
+    }
+    
     public Pizza findById(int id) {
 
         return pizzas.stream()
                 .filter(p -> p.id() == id)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public FoodItem findFoodItembyId(int id) {
+        
+        return foodItems.stream()
+            .filter(item -> item.id() == id)
+            .findFirst()
+            .orElse(null);
     }
 }

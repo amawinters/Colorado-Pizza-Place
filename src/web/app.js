@@ -1,6 +1,9 @@
 let menu = [];
 let cart = [];
 let selectedPizza = null;
+let foodItems = [];
+let selectedWing = null;
+let selectedWingSauce = null;
 let toppingsData = {
     meat: [],
     veggie: [],
@@ -126,6 +129,112 @@ function updatePrice() {
     document.getElementById('customPrice').textContent = price.toFixed(2);
 }
 
+/* ---------------- LOAD ADDITIONAL FOOD ITEMS ---------------- */
+async function loadFoodItems() {
+    try {
+        const response = await fetch('/api/food-items');
+        if (!response.ok) {
+            throw new Error("Unable to load additonal food items");
+    }
+    foodItems = await response.json();
+    const foodContainer = document.getElementById('foodItems');
+    foodContainer.innerHTML = foodItems.map(item => {
+            let button;
+            if (item.name == "Wings") {
+                button = `
+                    <button
+                        class="primary"
+                        onclick="openWingsCustomization(${item.id})">
+                        Customize Wings
+                    </button>
+                `;
+            }else{
+                button = `
+                    <button
+                        class="primary"
+                        onclick="addFoodItemToCart(${item.id})">
+                        Add to Cart
+                    </button>
+                `;
+            return `
+                <article class="card">
+                    <div class="pizza-icon">🍽️</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.description}</p>
+                    <p>
+                        <strong>$${item.price.toFixed(2)}</strong>
+                    </p>
+                    ${button}
+                </article>
+            `;
+            }
+        }).join('');
+    } catch (error) {
+        console.error(error);
+        document.getElementById('foodItems').innerHTML = 
+            '<p>Unable to load additional food items.</p/>';
+    }
+}
+
+/* ---------------- WING FUNCTIONS ---------------- */
+async function openWingCustomization(id) {
+    selectedWing = foodItems.find(item => item.id ==== id);
+    if(!selectedWing) {
+        return;
+    }
+    try {
+        const response = await fetch('/api/wing-sauces');
+        if(!response.ok) {
+            throw new Error("Unable to load wing sauces");
+        }
+        const sauces - await response.json();
+        const sauceContainer = document.getElementById('wingSauces');
+        sauceContainer.innerHTML = sauces.map((sauce, index) => `
+            <label class="topping-option">
+                <input
+                    type="radio"
+                    name="wingSauce"
+                    value="${sauce}"
+                    ${index === 0 ? 'checked' : ''}
+                    onchange="selectedWingSauce(this.value)">
+                ${sauce}
+            </label>
+        `).join('');
+        selectedWingSauce = sauces[0];
+        document.getElementById('wingPrice').textContent = 
+            selectedWing.price.toFixed(2);
+        document.getELementById('wingModal').classList.remove('hidden');
+    } catch (error) {
+        console.error(error);
+        alert("Unable to load wing sauces.");
+    }
+}
+function selectWingSauce(sauce) {
+    selectWingSauce = sauce;
+}
+function closeWingModal() {
+    document.getElementById('wingModal').classList.add('hidden');
+}
+function addWingsToCart() {
+    if (!selectedWing) {
+        return;
+    }
+    if(!selectedWingSauce) {
+        showMessage("Please select a sauce for your wings.");
+    }
+    const item = {
+        pizzaName: selectedWing.name,
+        size: "N/A",
+        crust: "N/A",
+        toppings: [`Sauce: ${selectedWingSauce}`],
+        unitPrice: selectedWing.price,
+        quantity: 1
+    };
+    cart.push(item);
+    closedWingModal();
+    updateCartCount();
+    openCart();
+}
 /* ---------------- CART FUNCTIONS ---------------- */
 function addToCart() {
     if (!selectedPizza) return;
@@ -152,6 +261,24 @@ function addToCart() {
     }
 
     closeCustomize();
+    updateCartCount();
+    openCart();
+}
+
+function addFoodItemToCart(id) {
+    const item = foodItems.find(food => food.id === id);
+    if(!item) {
+        return;
+    }
+    const cartItem = {
+        pizzaName: item.name,
+        size: 'N/A',
+        crust: 'N/A',
+        toppings: [],
+        unitPrice: item.price,
+        quantity: 1
+    };
+    cart.push(cartItem);
     updateCartCount();
     openCart();
 }
@@ -334,3 +461,4 @@ function showMessage(text) {
 /* ---------------- INIT ---------------- */
 loadMenu();
 loadToppings();
+loadFoodItems();

@@ -175,12 +175,59 @@ public class PizzaServer {
     private void foodItems(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
             send(exchange, 405, "Method Not Allowed", "text/plain");
+    private void foodItems(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
             return;
         }
-
         StringBuilder json = new StringBuilder("[");
-        List<FoodItem> items = menuService.getFoodItems(); // FIXED
+        List<FoodItem> items = menuService.getFoodItems();
 
+        for (int i = 0; i < items.size(); i++) {
+            FoodItem item = items.get(i);
+            if (i > 0) {
+                json.append(",");
+            }
+            json.append("{")
+                .append("\"id\":")
+                .append(item.id())
+
+                .append(",\"name\":\"")
+                .append(escape(item.name()))
+
+                .append("\",\"description\":\"")
+                .append(escape(item.description()))
+
+                .append("\",\"price\":")
+                .append(item.price())
+
+                .append("}");
+        }
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    private void wingSauces(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
+        }
+        StringBuilder json = new StringBuilder("[");
+        List<String> sauces = menuService.getWingSauces();
+
+        for (int i = 0; i < sauces.size(); i++) {
+            if (i > 0) {
+                json.append(",");
+            }
+            json.append("\"")
+                .append(escape(sauces.get(i)))
+                .append("\"");
+        }
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    private void appendList(StringBuilder json, List<String> items){
         for (int i = 0; i < items.size(); i++) {
             FoodItem item = items.get(i);
             if (i > 0) json.append(",");
