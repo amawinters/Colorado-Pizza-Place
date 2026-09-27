@@ -75,22 +75,37 @@ async function loadFoodItems() {
     }
     foodItems = await response.json();
     const foodContainer = document.getElementById('foodItems');
-    foodContainer.innerHTML = foodItems.map(item => `
-        <article class="card>
-            <div class="pizza-icon">🍽️</div>
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-
-            <p>
-                <strong>$${item.price.toFixed(2)}</strong>
-            </p>
-            <button
-                class="primary"
-                onclick="addFoodItemToCart(${item.id})">
-                Add to Cart
-            </button>
-        </article>
-    `).join('');
+    foodContainer.innerHTML = foodItems.map(item => {
+            let button;
+            if (item.name == "Wings") {
+                button = `
+                    <button
+                        class="primary"
+                        onclick="openWingsCustomization(${item.id})">
+                        Customize Wings
+                    </button>
+                `;
+            }else{
+                button = `
+                    <button
+                        class="primary"
+                        onclick="addFoodItemToCart(${item.id})">
+                        Add to Cart
+                    </button>
+                `;
+            return `
+                <article class="card">
+                    <div class="pizza-icon">🍽️</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.description}</p>
+                    <p>
+                        <strong>$${item.price.toFixed(2)}</strong>
+                    </p>
+                    ${button}
+                </article>
+            `;
+            }
+        }).join('');
     } catch (error) {
         console.error(error);
         document.getElementById('foodItems').innerHTML = 
