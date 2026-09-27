@@ -17,7 +17,7 @@ public class MenuService {
     );
     
     public static final List<String> WING_SAUCES = List.of(
-        "Buffalo","BBQ","Garlic Parmesan","Honey Chipotle","Unsauced"
+        "Buffalo","BBQ","Garlic Parmesan","Honey Chipotle"
     );
 
     public static List<String> getMeatToppings() {
