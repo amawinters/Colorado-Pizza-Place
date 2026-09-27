@@ -384,3 +384,4 @@ function showMessage(text) {
 /* ---------------- INIT ---------------- */
 loadMenu();
 loadToppings();
+loadFoodItems();
