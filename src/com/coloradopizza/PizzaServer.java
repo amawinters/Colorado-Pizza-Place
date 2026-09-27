@@ -13,7 +13,6 @@ import java.util.List;
 public class PizzaServer {
     private static final int PORT = 8080;
 
-    // Instance services
     private final MenuService menuService = new MenuService();
     private final OrderCalculator calculator = new OrderCalculator();
 
@@ -24,7 +23,7 @@ public class PizzaServer {
     public void start() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        // Web pages
+        // web pages
         server.createContext("/", this::home);
 
         // API endpoints
@@ -34,10 +33,9 @@ public class PizzaServer {
         server.createContext("/api/wing-sauces", this::wingSauces);
         server.createContext("/health", this::health);
 
-        // Static files
+        // static files
         server.createContext("/style.css",
                 exchange -> staticFile(exchange, "style.css", "text/css"));
-
         server.createContext("/app.js",
                 exchange -> staticFile(exchange, "app.js", "application/javascript"));
 
@@ -47,7 +45,6 @@ public class PizzaServer {
                 return;
             }
 
-            // Build path inside src/web/images
             String filePath = exchange.getRequestURI().getPath().replaceFirst("/", "");
             Path file = Path.of("src", "web", filePath);
 
@@ -73,9 +70,7 @@ public class PizzaServer {
         System.out.println("Colorado Pizza Place is running at http://localhost:" + PORT);
     }
 
-    // ---------------------------
-    // Web Page Handlers
-    // ---------------------------
+    // ----------------- pages -----------------
 
     private void home(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
@@ -102,9 +97,7 @@ public class PizzaServer {
         send(exchange, 200, content, contentType);
     }
 
-    // ---------------------------
-    // API: Menu
-    // ---------------------------
+    // ----------------- /api/menu -----------------
 
     private void menu(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
@@ -139,9 +132,7 @@ public class PizzaServer {
         send(exchange, 200, json.toString(), "application/json");
     }
 
-    // ---------------------------
-    // API: Toppings
-    // ---------------------------
+    // ----------------- /api/toppings -----------------
 
     private void toppings(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
@@ -168,66 +159,17 @@ public class PizzaServer {
         send(exchange, 200, json.toString(), "application/json");
     }
 
-    // ---------------------------
-    // API: Food Items
-    // ---------------------------
+    // ----------------- /api/food-items -----------------
 
-    private void foodItems(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
-            send(exchange, 405, "Method Not Allowed", "text/plain");
     private void foodItems(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
             send(exchange, 405, "Method Not Allowed", "text/plain");
             return;
         }
+
         StringBuilder json = new StringBuilder("[");
         List<FoodItem> items = menuService.getFoodItems();
 
-        for (int i = 0; i < items.size(); i++) {
-            FoodItem item = items.get(i);
-            if (i > 0) {
-                json.append(",");
-            }
-            json.append("{")
-                .append("\"id\":")
-                .append(item.id())
-
-                .append(",\"name\":\"")
-                .append(escape(item.name()))
-
-                .append("\",\"description\":\"")
-                .append(escape(item.description()))
-
-                .append("\",\"price\":")
-                .append(item.price())
-
-                .append("}");
-        }
-        json.append("]");
-        send(exchange, 200, json.toString(), "application/json");
-    }
-
-    private void wingSauces(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
-            send(exchange, 405, "Method Not Allowed", "text/plain");
-            return;
-        }
-        StringBuilder json = new StringBuilder("[");
-        List<String> sauces = menuService.getWingSauces();
-
-        for (int i = 0; i < sauces.size(); i++) {
-            if (i > 0) {
-                json.append(",");
-            }
-            json.append("\"")
-                .append(escape(sauces.get(i)))
-                .append("\"");
-        }
-        json.append("]");
-        send(exchange, 200, json.toString(), "application/json");
-    }
-
-    private void appendList(StringBuilder json, List<String> items){
         for (int i = 0; i < items.size(); i++) {
             FoodItem item = items.get(i);
             if (i > 0) json.append(",");
@@ -244,9 +186,7 @@ public class PizzaServer {
         send(exchange, 200, json.toString(), "application/json");
     }
 
-    // ---------------------------
-    // API: Wing Sauces
-    // ---------------------------
+    // ----------------- /api/wing-sauces -----------------
 
     private void wingSauces(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
@@ -255,7 +195,7 @@ public class PizzaServer {
         }
 
         StringBuilder json = new StringBuilder("[");
-        List<String> sauces = MenuService.getWingSauces(); // FIXED
+        List<String> sauces = MenuService.getWingSauces();
 
         for (int i = 0; i < sauces.size(); i++) {
             if (i > 0) json.append(",");
@@ -266,9 +206,7 @@ public class PizzaServer {
         send(exchange, 200, json.toString(), "application/json");
     }
 
-    // ---------------------------
-    // Helpers
-    // ---------------------------
+    // ----------------- helpers -----------------
 
     private void appendList(StringBuilder json, List<String> items) {
         for (int i = 0; i < items.size(); i++) {
@@ -293,7 +231,6 @@ public class PizzaServer {
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", contentType + "; charset=UTF-8");
         exchange.sendResponseHeaders(status, bytes.length);
-
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(bytes);
         }
