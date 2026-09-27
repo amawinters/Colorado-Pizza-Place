@@ -35,11 +35,6 @@ public class MenuService {
         new Pizza(4, "Veggie Supreme", "Green peppers, onions, mushrooms, black olives, and tomatoes. This includes pizza sauce and cheese on your choice of crust.", 13.49, List.of())
     );
 
-    public List<Pizza> getPizzas() {
-
-        return pizzas;
-    }
-
     private final List<FoodItem> foodItems = List.of(
         new FoodItem(
             101,
@@ -54,12 +49,29 @@ public class MenuService {
             9.99
         )
     );
+    
+    public List<Pizza> getPizzas() {
 
+        return pizzas;
+    }
+
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
+    }
+    
     public Pizza findById(int id) {
 
         return pizzas.stream()
                 .filter(p -> p.id() == id)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public FoodItem findFoodItembyId(int id) {
+        
+        return foodItems.stream()
+            .filter(item -> item.id() == id)
+            .findFirst()
+            .orElse(null);
     }
 }
