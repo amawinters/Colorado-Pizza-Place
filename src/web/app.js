@@ -1,4 +1,5 @@
 let menu = [];
+let foodItems = [];
 let cart = [];
 let selectedPizza = null;
 let toppingsData = {
@@ -65,6 +66,37 @@ async function loadMenu() {
     }
 }
 
+/* ---------------- LOAD ADDITIONAL FOOD ITEMS ---------------- */
+async function loadFoodItems() {
+    try {
+        const response = await fetch('/api/food-items');
+        if (!response.ok) {
+            throw new Error("Unable to load additonal food items");
+    }
+    foodItems = await response.json();
+    const foodContainer = document.getElementById('foodItems');
+    foodContainer.innerHTML = foodItems.map(item => `
+        <article class="card>
+            <div class="pizza-icon">🍽️</div>
+            <h3>${item.name}</h3>
+            <p>${item.description}</p>
+
+            <p>
+                <strong>$${item.price.toFixed(2)}</strong>
+            </p>
+            <button
+                class="primary"
+                onclick="addFoodItemToCart(${item.id})">
+                Add to Cart
+            </button>
+        </article>
+    `).join('');
+    } catch (error) {
+        console.error(error);
+        document.getElementById('foodItems').innerHTML = 
+            '<p>Unable to load additional food items.</p/>';
+    }
+}
 /* ---------------- LOAD TOPPINGS ---------------- */
 async function loadToppings() {
     try {
@@ -152,6 +184,24 @@ function addToCart() {
     }
 
     closeCustomize();
+    updateCartCount();
+    openCart();
+}
+
+function addFoodItemToCart(id) {
+    const item = foodItems.find(food => food.id === id);
+    if(!item) {
+        return;
+    }
+    const cartItem = {
+        pizzaName: item.name,
+        size: 'N/A',
+        crust: 'N/A',
+        toppings: [],
+        unitPrice: item.price,
+        quantity: 1
+    };
+    cart.push(cartItem);
     updateCartCount();
     openCart();
 }
