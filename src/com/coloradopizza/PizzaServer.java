@@ -12,6 +12,8 @@ import java.util.List;
 
 public class PizzaServer {
     private static final int PORT = 8080;
+
+    // Instance services
     private final MenuService menuService = new MenuService();
     private final OrderCalculator calculator = new OrderCalculator();
 
@@ -21,21 +23,31 @@ public class PizzaServer {
 
     public void start() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        //web pages
+
+        // Web pages
         server.createContext("/", this::home);
+
+        // API endpoints
         server.createContext("/api/menu", this::menu);
         server.createContext("/api/toppings", this::toppings);
+        server.createContext("/api/food-items", this::foodItems);
+        server.createContext("/api/wing-sauces", this::wingSauces);
         server.createContext("/health", this::health);
-        //static files
-        server.createContext("/style.css", exchange -> staticFile(exchange, "style.css", "text/css"));
-        server.createContext("/app.js", exchange -> staticFile(exchange, "app.js", "application/javascript"));
+
+        // Static files
+        server.createContext("/style.css",
+                exchange -> staticFile(exchange, "style.css", "text/css"));
+
+        server.createContext("/app.js",
+                exchange -> staticFile(exchange, "app.js", "application/javascript"));
+
         server.createContext("/images", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
                 send(exchange, 405, "Method Not Allowed", "text/plain");
                 return;
             }
 
-            // Remove leading slash and build path inside src/web/images
+            // Build path inside src/web/images
             String filePath = exchange.getRequestURI().getPath().replaceFirst("/", "");
             Path file = Path.of("src", "web", filePath);
 
@@ -54,11 +66,16 @@ public class PizzaServer {
                 os.write(bytes);
             }
         });
+
         server.setExecutor(null);
         server.start();
 
         System.out.println("Colorado Pizza Place is running at http://localhost:" + PORT);
     }
+
+    // ---------------------------
+    // Web Page Handlers
+    // ---------------------------
 
     private void home(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
@@ -73,6 +90,7 @@ public class PizzaServer {
             send(exchange, 405, "Method Not Allowed", "text/plain");
             return;
         }
+
         Path file = Path.of("src", "web", name);
 
         if (!Files.exists(file)) {
@@ -80,91 +98,140 @@ public class PizzaServer {
             return;
         }
 
-            String content = Files.readString(file, StandardCharsets.UTF_8);
-            send(exchange, 200, content, contentType);
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        send(exchange, 200, content, contentType);
     }
+
+    // ---------------------------
+    // API: Menu
+    // ---------------------------
 
     private void menu(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")){
-            send(exchange, 405, "Method Not Allowed", "text/plain");
-            return;
-        }
-        StringBuilder json = new StringBuilder("[");
-        List<Pizza> pizzas = menuService.getPizzas();
-        for (int i = 0; i < pizzas.size(); i++) {
-            Pizza pizza = pizzas.get(i);
-            if (i > 0) {
-                json.append(',');
-            }
-            json.append("{")
-                    .append("\"id\":")
-                    .append(pizza.id())
-
-                    .append(",\"name\":\"")
-                    .append(escape(pizza.name()))
-
-                    .append("\",\"description\":\"")
-                    .append(escape(pizza.description()))
-
-                    .append("\",\"basePrice\":")
-                    .append(pizza.basePrice())
-
-                    .append(",\"toppings\":[\"");
-
-            List<String> toppings = pizza.toppings();
-            for (int j = 0; j < toppings.size(); j++) {
-                if (j > 0) {
-                    json.append("\",\"");
-                }
-                json.append(
-                        escape(toppings.get(j))
-                );
-            }
-            json.append("\"]}");
-        }
-        json.append("]");
-        send(exchange, 200, json.toString(), "application/json");
-    }
-
-    private void toppings(HttpExchange exchange) throws IOException{
         if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
             send(exchange, 405, "Method Not Allowed", "text/plain");
             return;
         }
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        //Meat Toppings
+
+        StringBuilder json = new StringBuilder("[");
+        List<Pizza> pizzas = menuService.getPizzas();
+
+        for (int i = 0; i < pizzas.size(); i++) {
+            Pizza pizza = pizzas.get(i);
+            if (i > 0) json.append(",");
+
+            json.append("{")
+                .append("\"id\":").append(pizza.id())
+                .append(",\"name\":\"").append(escape(pizza.name())).append("\"")
+                .append(",\"description\":\"").append(escape(pizza.description())).append("\"")
+                .append(",\"basePrice\":").append(pizza.basePrice())
+                .append(",\"toppings\":[\"");
+
+            List<String> toppings = pizza.toppings();
+            for (int j = 0; j < toppings.size(); j++) {
+                if (j > 0) json.append("\",\"");
+                json.append(escape(toppings.get(j)));
+            }
+
+            json.append("\"]}");
+        }
+
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    // ---------------------------
+    // API: Toppings
+    // ---------------------------
+
+    private void toppings(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
+        }
+
+        StringBuilder json = new StringBuilder("{");
+
         json.append("\"meat\":[");
         appendList(json, MenuService.getMeatToppings());
         json.append("],");
 
-        //Veggie Toppings
         json.append("\"veggie\":[");
         appendList(json, MenuService.getVeggieToppings());
         json.append("],");
 
-        //Cheese Toppings
         json.append("\"cheese\":[");
         appendList(json, MenuService.getCheeseToppings());
         json.append("]");
+
         json.append("}");
 
         send(exchange, 200, json.toString(), "application/json");
     }
 
-    private void appendList(StringBuilder json, List<String> items){
+    // ---------------------------
+    // API: Food Items
+    // ---------------------------
+
+    private void foodItems(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
+        }
+
+        StringBuilder json = new StringBuilder("[");
+        List<FoodItem> items = menuService.getFoodItems(); // FIXED
+
         for (int i = 0; i < items.size(); i++) {
-            if (i>0) {
-                json.append(",");
-            }
-            json.append("\"")
-                    .append(escape(items.get(i)))
-                    .append("\"");
+            FoodItem item = items.get(i);
+            if (i > 0) json.append(",");
+
+            json.append("{")
+                .append("\"id\":").append(item.id())
+                .append(",\"name\":\"").append(escape(item.name())).append("\"")
+                .append(",\"description\":\"").append(escape(item.description())).append("\"")
+                .append(",\"price\":").append(item.price())
+                .append("}");
+        }
+
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    // ---------------------------
+    // API: Wing Sauces
+    // ---------------------------
+
+    private void wingSauces(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+            send(exchange, 405, "Method Not Allowed", "text/plain");
+            return;
+        }
+
+        StringBuilder json = new StringBuilder("[");
+        List<String> sauces = MenuService.getWingSauces(); // FIXED
+
+        for (int i = 0; i < sauces.size(); i++) {
+            if (i > 0) json.append(",");
+            json.append("\"").append(escape(sauces.get(i))).append("\"");
+        }
+
+        json.append("]");
+        send(exchange, 200, json.toString(), "application/json");
+    }
+
+    // ---------------------------
+    // Helpers
+    // ---------------------------
+
+    private void appendList(StringBuilder json, List<String> items) {
+        for (int i = 0; i < items.size(); i++) {
+            if (i > 0) json.append(",");
+            json.append("\"").append(escape(items.get(i))).append("\"");
         }
     }
 
     private void health(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")){
+        if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
             send(exchange, 405, "Method Not Allowed", "text/plain");
             return;
         }
@@ -179,6 +246,7 @@ public class PizzaServer {
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", contentType + "; charset=UTF-8");
         exchange.sendResponseHeaders(status, bytes.length);
+
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(bytes);
         }
