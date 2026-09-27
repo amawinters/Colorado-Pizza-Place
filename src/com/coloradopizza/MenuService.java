@@ -40,6 +40,21 @@ public class MenuService {
         return pizzas;
     }
 
+    private final List<FoodItem> foodItems = List.of(
+        new FoodItem(
+            101,
+            "Garlic Bread",
+            "Warm garlic bread served with pizza sauce.",
+            5.99
+        ),
+        new FoodItem(
+            102,
+            "Wings",
+            "Juicy bone-in, chicken wings with your choice of sauce.",
+            9.99
+        )
+    );
+
     public Pizza findById(int id) {
 
         return pizzas.stream()
